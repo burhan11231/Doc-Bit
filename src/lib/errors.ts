@@ -1,0 +1,1 @@
+export class AppError extends Error{constructor(message:string,public code='APP_ERROR',public status=500){super(message)}}export const toMessage=(error:unknown):string=>error instanceof Error?error.message:'Something went wrong';

@@ -1,0 +1,29 @@
+name: DocBit validation
+
+on:
+  pull_request:
+  push:
+    branches: [main, work]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
+      VITE_POSTHOG_HOST: ${{ secrets.VITE_POSTHOG_HOST }}
+      VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - run: rm -rf node_modules package-lock.json
+      - run: npm install --registry=https://registry.npmjs.org
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build
+      - run: timeout 15s npm run dev || code=$?; if [ "${code:-0}" = "124" ]; then exit 0; else exit "${code:-0}"; fi
