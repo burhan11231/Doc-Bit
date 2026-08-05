@@ -1,0 +1,2 @@
+import { Navigate,Outlet } from 'react-router-dom';import { Skeleton } from '@/components/ui/Card';import { useSession } from '@/hooks/useSession';
+export function ProtectedRoute(){const {data,isLoading}=useSession();if(isLoading)return <div className="p-8"><Skeleton className="h-12"/></div>;return data?<Outlet/>:<Navigate to="/auth/login" replace/>}export function RoleProtectedRoute(){return <ProtectedRoute/>}
